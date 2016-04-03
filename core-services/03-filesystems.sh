@@ -15,9 +15,13 @@ if [ -x /bin/btrfs ]; then
     btrfs device scan || emergency_shell
 fi
 
-if [ -x /sbin/vgchange -o -x /bin/vgchange ]; then
-    msg "Activating LVM devices..."
-    vgchange --sysinit -a y || emergency_shell
+if [ "$LVMONLUKS" = "1" ]; then
+    msg "You set LVMONLUKS, skipping LVM activation before activation of encrypted devices."
+else
+    if [ -x /sbin/vgchange -o -x /bin/vgchange ]; then
+        msg "Activating LVM devices..."
+        vgchange --sysinit -a y || emergency_shell
+    fi
 fi
 
 if [ -e /etc/crypttab ]; then
